@@ -78,16 +78,16 @@ public:
       timer.overflow &= timer.overflow ^ new_cycle;
       // When should a timer be triggered?
       // normally: timer.timeout_tick <= now
-      // add this if (new_cycle==1): last_tick_ < timer.timeout_tick
-      // timeout<=now | new_cycle | last_tick<timeout --> trigger
-      //            0           0                   0           0
-      //            0           0                   1           0
-      //            0           1                   0           0
-      //            0           1                   1           1
-      //            1           ?                   ?           1
-      if (timer.deleted || timer.overflow // first, check if valid
-          || !(timer.timeout_tick <= now ||
-               (new_cycle && last_tick_ < timer.timeout_tick)))
+      // and, if (new_cycle==1): last_tick_ <= timer.timeout_tick
+      // timeout<=now | new_cycle | last_tick<=timeout --> trigger
+      //            0           0                    0           0
+      //            0           0                    1           0
+      //            0           1                    0           0
+      //            0           1                    1           1
+      //            1           ?                    ?           1
+      if (timer.deleted || timer.overflow)
+        continue;
+      if (!(timer.timeout_tick <= now || (new_cycle && last_tick_ <= timer.timeout_tick)))
         continue;
       // timer triggered
       tasks.push(timer.callback);

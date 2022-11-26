@@ -57,7 +57,7 @@ static void timers_scan(ELF *pelf) {
     //            1           ?                   ?           1
     */
     trigger = (pt->timeout_tick <= now ||
-               (new_cycle && ptimers->last_tick < pt->timeout_tick));
+               (new_cycle && ptimers->last_tick <= pt->timeout_tick));
     if (pt->deleted || pt->overflow || !trigger)
       continue;
     tasks_push(&pelf->tasks_control, pt->callback);
